@@ -1,0 +1,90 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+
+const formData = ref({
+  currentPassword: '',
+  newPassword: '',
+  confirmNewPassword: '',
+});
+
+async function handleSubmit() {
+  if (formData.value.newPassword !== formData.value.confirmNewPassword) {
+    alert('New passwords do not match');
+    return;
+  }
+
+  if (formData.value.newPassword.length < 8) {
+    alert('Password must be at least 8 characters long');
+    return;
+  }
+
+  const success = await authStore.changePassword(formData.value);
+  
+  if (success) {
+    alert('Password changed successfully!');
+    formData.value = {
+      currentPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
+    };
+  } else {
+    alert(authStore.error || 'Failed to change password');
+  }
+}
+</script>
+
+<template>
+  <div class="change-password-page">
+    <h1>Change Password</h1>
+
+    <form @submit.prevent="handleSubmit" class="password-form">
+      <div class="form-group">
+        <label>Current Password *</label>
+        <input
+          v-model="formData.currentPassword"
+          type="password"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label>New Password *</label>
+        <input
+          v-model="formData.newPassword"
+          type="password"
+          required
+          minlength="8"
+        />
+        <p class="help-text">Minimum 8 characters</p>
+      </div>
+
+      <div class="form-group">
+        <label>Confirm New Password *</label>
+        <input
+          v-model="formData.confirmNewPassword"
+          type="password"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-primary" :disabled="authStore.loading">
+        {{ authStore.loading ? 'Changing...' : 'Change Password' }}
+      </button>
+    </form>
+  </div>
+</template>
+
+<style scoped>
+.change-password-page { max-width: 500px; }
+h1 { margin-bottom: 2rem; color: #2d3748; }
+.password-form { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; color: #4a5568; font-weight: 500; }
+.form-group input { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
+.help-text { font-size: 0.875rem; color: #718096; margin-top: 0.25rem; }
+.btn-primary { width: 100%; background: #48bb78; color: white; border: none; padding: 0.75rem; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 1rem; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+</style>
