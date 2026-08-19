@@ -39,6 +39,11 @@ const routes: RouteRecordRaw[] = [
         name: 'AdminRevenue',
         component: () => import('@/views/admin/Revenue.vue'),
       },
+      {
+        path: 'settings',
+        name: 'AdminSettings',
+        component: () => import('@/views/admin/Settings.vue'),
+      },
     ],
   },
   {

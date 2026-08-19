@@ -37,6 +37,9 @@ function handleLogout() {
         <router-link to="/admin/revenue" class="nav-link">
           <span>💰</span> Revenue
         </router-link>
+        <router-link to="/admin/settings" class="nav-link">
+          <span>⚙️</span> Settings
+        </router-link>
       </nav>
 
       <div class="sidebar-footer">
