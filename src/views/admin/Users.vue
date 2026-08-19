@@ -7,16 +7,13 @@ const userStore = useUserStore();
 const groupStore = useGroupStore();
 
 const showCreateModal = ref(false);
-const showEditModal = ref(false);
-const showDeleteConfirm = ref(false);
-const selectedUser = ref<any>(null);
 const generatedPassword = ref('');
 
 const formData = ref({
   firstName: '',
   lastName: '',
   email: '',
-  userType: 'SalesPerson',
+  userType: 'SalesPerson' as 'Admin' | 'SalesPerson',
   groupIds: [] as number[],
 });
 
@@ -53,7 +50,7 @@ function resetForm() {
     firstName: '',
     lastName: '',
     email: '',
-    userType: 'SalesPerson',
+    userType: 'SalesPerson' as 'Admin' | 'SalesPerson',
     groupIds: [],
   };
 }

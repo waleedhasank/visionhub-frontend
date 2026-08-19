@@ -119,6 +119,38 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function changePassword(data: { currentPassword: string; newPassword: string }): Promise<boolean> {
+    if (!token.value) return false;
+
+    loading.value = true;
+    error.value = null;
+    const apiUrl = import.meta.env.VITE_API_URL;
+
+    try {
+      const response = await fetch(`${apiUrl}/api/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        return true;
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to change password' }));
+        error.value = errorData.message || 'Failed to change password';
+        return false;
+      }
+    } catch {
+      error.value = 'Network error. Please try again.';
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     user,
     token,
@@ -131,5 +163,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     loadUserFromStorage,
     fetchCurrentUser,
+    changePassword,
   };
 });
