@@ -43,7 +43,10 @@ export const useGroupStore = defineStore('groups', () => {
 
     try {
       const group = await groupService.create(request);
-      await fetchAll(); // Refresh list
+      // Add to local store instead of refetching
+      if (group) {
+        groups.value.push(group);
+      }
       return group;
     } catch (err: any) {
       error.value = err.message || 'Failed to create group';
@@ -58,8 +61,12 @@ export const useGroupStore = defineStore('groups', () => {
     error.value = null;
 
     try {
-      await groupService.update(id, request);
-      await fetchAll(); // Refresh list
+      const updatedGroup = await groupService.update(id, request);
+      // Update in local store
+      const index = groups.value.findIndex(g => g.id === id);
+      if (index !== -1 && updatedGroup) {
+        groups.value[index] = updatedGroup;
+      }
       return true;
     } catch (err: any) {
       error.value = err.message || 'Failed to update group';
@@ -75,7 +82,8 @@ export const useGroupStore = defineStore('groups', () => {
 
     try {
       await groupService.delete(id);
-      await fetchAll(); // Refresh list
+      // Remove from local store instead of refetching
+      groups.value = groups.value.filter(g => g.id !== id);
       return true;
     } catch (err: any) {
       error.value = err.message || 'Failed to delete group';

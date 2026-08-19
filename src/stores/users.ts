@@ -43,7 +43,10 @@ export const useUserStore = defineStore('users', () => {
 
     try {
       const response = await userService.create(request);
-      await fetchAll(); // Refresh list
+      // Add the new user to local store instead of refetching
+      if (response.user) {
+        users.value.push(response.user);
+      }
       return response;
     } catch (err: any) {
       error.value = err.message || 'Failed to create user';
@@ -58,8 +61,12 @@ export const useUserStore = defineStore('users', () => {
     error.value = null;
 
     try {
-      await userService.update(id, request);
-      await fetchAll(); // Refresh list
+      const updatedUser = await userService.update(id, request);
+      // Update the user in local store
+      const index = users.value.findIndex(u => u.id === id);
+      if (index !== -1 && updatedUser) {
+        users.value[index] = updatedUser;
+      }
       return true;
     } catch (err: any) {
       error.value = err.message || 'Failed to update user';
@@ -75,7 +82,8 @@ export const useUserStore = defineStore('users', () => {
 
     try {
       await userService.delete(id);
-      await fetchAll(); // Refresh list
+      // Remove the user from local store instead of refetching
+      users.value = users.value.filter(u => u.id !== id);
       return true;
     } catch (err: any) {
       error.value = err.message || 'Failed to delete user';
